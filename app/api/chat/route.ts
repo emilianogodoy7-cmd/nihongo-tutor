@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase-server";
 import { JAPANESE_TUTOR_SYSTEM_PROMPT } from "@/lib/system-prompt";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -19,20 +19,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing message or sessionId" }, { status: 400 });
   }
 
-  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-    { role: "system", content: JAPANESE_TUTOR_SYSTEM_PROMPT },
+  const messages: Anthropic.MessageParam[] = [
     ...(history || []),
     { role: "user", content: message },
   ];
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+  const response = await anthropic.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 1024,
+    system: JAPANESE_TUTOR_SYSTEM_PROMPT,
     messages,
-    response_format: { type: "json_object" },
     temperature: 0.7,
   });
 
-  const raw = completion.choices[0].message.content ?? "{}";
+  const raw = response.content[0].type === "text" ? response.content[0].text : "{}";
   let parsed;
   try {
     parsed = JSON.parse(raw);
