@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     ];
 
     const response = await anthropic.messages.create({
-      model: "claude-3-haiku-20240307",
+      model: "claude-haiku-4-5",
       max_tokens: 1024,
       system: JAPANESE_TUTOR_SYSTEM_PROMPT,
       messages,
