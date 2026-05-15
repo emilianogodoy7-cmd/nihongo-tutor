@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
+import Nav from "@/components/Nav";
 
 interface Correction {
   original: string;
@@ -164,11 +165,6 @@ export default function ChatPage() {
     setLoading(false);
   }
 
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    router.push("/login");
-  }
-
   async function handleNewSession() {
     if (!userId) return;
     const { data } = await supabase
@@ -184,26 +180,19 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
+      <Nav />
+      {/* Chat sub-header */}
+      <div className="bg-white border-b border-gray-100 px-4 py-2 flex items-center justify-between">
         <div>
-          <h1 className="font-semibold text-gray-900">日本語チューター</h1>
-          <p className="text-xs text-gray-400">Hana · Japanese AI Tutor</p>
+          <p className="text-sm font-medium text-gray-700">Hana · AI Tutor</p>
+          <p className="text-xs text-gray-400">Chat freely in Japanese</p>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={handleNewSession}
-            className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            New chat
-          </button>
-          <button
-            onClick={handleSignOut}
-            className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            Sign out
-          </button>
-        </div>
+        <button
+          onClick={handleNewSession}
+          className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+        >
+          New chat
+        </button>
       </div>
 
       {/* Messages */}
