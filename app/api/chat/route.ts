@@ -34,7 +34,8 @@ export async function POST(req: NextRequest) {
       temperature: 0.7,
     });
 
-    const raw = response.content[0].type === "text" ? response.content[0].text : "{}";
+    const rawText = response.content[0].type === "text" ? response.content[0].text : "{}";
+    const raw = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
     let parsed;
     try {
       parsed = JSON.parse(raw);
