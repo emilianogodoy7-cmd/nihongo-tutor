@@ -2,12 +2,30 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { createClient } from "@/lib/supabase-browser";
 
 export default function Nav() {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    // Keep client session in sync with server cookies.
+    // onAuthStateChange fires on token refresh and sign-out,
+    // ensuring the singleton client stays current.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event: string) => {
+        if (event === "SIGNED_OUT") {
+          router.push("/login");
+        }
+        if (event === "TOKEN_REFRESHED") {
+          // Token silently refreshed — no action needed, cookie updated.
+        }
+      }
+    );
+    return () => subscription.unsubscribe();
+  }, [supabase, router]);
 
   async function signOut() {
     await supabase.auth.signOut();

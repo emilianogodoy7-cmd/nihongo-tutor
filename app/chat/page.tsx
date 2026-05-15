@@ -107,7 +107,7 @@ export default function ChatPage() {
       .order("created_at", { ascending: true });
 
     if (msgs) {
-      const loaded: Message[] = msgs.map((m) => {
+      const loaded: Message[] = msgs.map((m: Record<string, string>) => {
         if (m.role === "assistant") {
           try {
             return { id: m.id, role: "assistant", content: m.content, parsed: JSON.parse(m.content) };

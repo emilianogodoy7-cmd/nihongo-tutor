@@ -25,16 +25,19 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  // getSession() reads the JWT from cookies — no network round-trip.
+  // This is intentional: network-dependent getUser() caused spurious logouts
+  // when Supabase was slow. getUser() is still used in API routes for verified identity.
+  const { data: { session } } = await supabase.auth.getSession();
 
   const { pathname } = request.nextUrl;
 
-  if (!user && pathname !== "/login") {
+  if (!session && pathname !== "/login") {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (user && pathname === "/login") {
-    return NextResponse.redirect(new URL("/chat", request.url));
+  if (session && pathname === "/login") {
+    return NextResponse.redirect(new URL("/learn", request.url));
   }
 
   return supabaseResponse;
